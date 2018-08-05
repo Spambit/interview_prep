@@ -53,6 +53,11 @@ class SetOfStacks implements  StackInterface{
           collectionOfStacks[i] = new Stack(i,i);
       }
   }
+  
+  public boolean recursiveSort() {
+      throw new UnsupportedOperationException("Not supported yet.");
+  }
+  
   public boolean push(int data){
       for(int i = 0; i < SetOfStacks.MAX_SIZE ; i++){
         Stack stack = collectionOfStacks[i];

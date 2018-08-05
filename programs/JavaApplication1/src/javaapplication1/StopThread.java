@@ -41,7 +41,7 @@ public class StopThread {
   }
 }
 
-
+/*
 public class MyFrameStateListener implements FrameListener {
     public void onCameraFrame(CameraWorkerHandler handler,CameraFrame frame){
         if(handler.shouldShutdown()){
@@ -52,4 +52,4 @@ public class MyFrameStateListener implements FrameListener {
             }).start();
         }
     }
-}
+}*/
