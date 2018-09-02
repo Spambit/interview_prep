@@ -15,61 +15,122 @@ import java.util.HashSet;
  */
 public class Array {
 
+    public static class Sort {
+
+        public static int[] insertion(int[] arr) {
+            for (int i = 1; i < arr.length; i++) {
+                int data = arr[i];
+                placeDataInProperPosition(arr, data, 0, i);
+            }
+
+            return arr;
+        }
+
+        //idea is - left part of array is always sorted and right is always unsorted. Finally left part is the result.
+        private static void placeDataInProperPosition(int arr[], int data, int startIndex, int endIndex) {
+            for (int i = endIndex; i > startIndex; i--) {
+                int prevData = arr[i - 1];
+                if (data < prevData) {
+                    arr[i - 1] = data;
+                    arr[i] = prevData;
+                }
+            }
+        }
+        
+        private static int indexOfMin(int arr[], int startIndex, int endIndex) {
+            int minIndex = startIndex , min = arr[startIndex];
+            for (int i = startIndex; i <= endIndex; i++) {
+                int current = arr[i];
+                if(min > current)  {
+                    minIndex = i;
+                    min = current;
+                }
+            }
+            return minIndex;
+        }
+        
+        private static void findMinAndSwapWithData(int arr[], int data, int dataIndex, int startIndex) {
+            int indexOfMin = indexOfMin(arr, startIndex, arr.length - 1);
+            int minDataAtRight = arr[indexOfMin];
+            System.out.println("Current index: "+dataIndex+ " current data : "+data+" minIndex "+indexOfMin+" minData: "+minDataAtRight);
+            if(data > minDataAtRight) {
+                arr[dataIndex] = minDataAtRight;
+                arr[indexOfMin] = data;
+            }
+        }
+        
+        public static int[] bubble(int[] arr) {
+            for (int i = 0; i < arr.length -1; i++) {
+                int data = arr[i];
+                findMinAndSwapWithData(arr, data, i, i + 1);
+            }
+
+            return arr;
+        }
+    }
+
+    public static void print(int arr[]) {
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(" " + arr[i] + " ");
+        }
+    }
+
     public static class SubsetSum {
 
         public static class ImprovedRecusive {
 
             public static HashSet<Integer> findSubsetWhichSumUpto(int[] arr, int sum) {
                 HashSet<Integer> hashset = null;
-                for (int i = 0; i< arr.length ; i ++) {
-                    hashset = findSubsetWhichSumUptoInternal(arr,sum,i,arr.length - 1);
-                    if(!hashset.isEmpty()){
+                for (int i = 0; i < arr.length; i++) {
+                    hashset = findSubsetWhichSumUptoInternal(arr, sum, i, arr.length - 1);
+                    if (!hashset.isEmpty()) {
                         break;
                     }
                 }
-                System.out.println("Accessed array: "+arrayAccessedCounter);
+                System.out.println("Accessed array: " + arrayAccessedCounter);
                 return hashset;
             }
 
             static int arrayAccessedCounter = 0;
+
             private static HashSet<Integer> findSubsetWhichSumUptoInternal(int[] arr, int sum, int startIndex, int endIndex) {
                 HashSet<Integer> list = new HashSet();
                 int data = arr[startIndex];
                 arrayAccessedCounter++;
-                System.out.println("Looking for subset which sum upto: "+sum + " start: "+ startIndex + " end: "+endIndex);
-                if(data > sum) {
+                System.out.println("Looking for subset which sum upto: " + sum + " start: " + startIndex + " end: " + endIndex);
+                if (data > sum) {
                     System.out.println("Returning empty list because " + data + " is greater than " + sum);
                     return list;
                 }
-                if (data == sum ) {
-                    System.out.println("Adding the value : " +sum + " because " + data + " is equal to " + sum);
+                if (data == sum) {
+                    System.out.println("Adding the value : " + sum + " because " + data + " is equal to " + sum);
                     list.add(data);
                     return list;
                 }
                 if ((startIndex == endIndex)) {
-                    System.out.println("Returning list because startIndex and endIndex are equal which is : "+startIndex);
+                    System.out.println("Returning list because startIndex and endIndex are equal which is : " + startIndex);
                     return list;
                 }
-                
+
                 int findSum = sum - data;
                 HashSet<Integer> subsetsWhichSumUptoFindSum = new HashSet();
-                System.out.println("Now looking for subset which sum upto remaining sum : "+findSum + " because value now is : "+data);
-                
+                System.out.println("Now looking for subset which sum upto remaining sum : " + findSum + " because value now is : " + data);
+
                 for (int i = startIndex + 1; i <= endIndex; i++) {
-                    System.out.println("Saecrh start from : "+i);
+                    System.out.println("Saecrh start from : " + i);
                     subsetsWhichSumUptoFindSum = findSubsetWhichSumUptoInternal(arr, findSum, i, endIndex);
-                    System.out.println("Search end from : "+i); 
-                    if(!subsetsWhichSumUptoFindSum.isEmpty()) {
-                        System.out.println("Found a Search end from : "+i+" so breaking from the loop." ); 
+                    System.out.println("Search end from : " + i);
+                    if (!subsetsWhichSumUptoFindSum.isEmpty()) {
+                        System.out.println("Found a Search end from : " + i + " so breaking from the loop.");
                         break;
                     }
                 }
-                
-                System.out.println("Search complete for sum : "+sum + " in elements from: "+startIndex + " to endIndex: "+endIndex);
-               
+
+                System.out.println("Search complete for sum : " + sum + " in elements from: " + startIndex + " to endIndex: " + endIndex);
+
                 if (!subsetsWhichSumUptoFindSum.isEmpty()) {
                     list.addAll(subsetsWhichSumUptoFindSum);
-                    System.out.println("Found sum:  "+subsetsWhichSumUptoFindSum);
+                    System.out.println("Found sum:  " + subsetsWhichSumUptoFindSum);
                     list.add(data);
                     System.out.println("Found a match and the list is : " + list);
                 }
@@ -461,20 +522,22 @@ public class Array {
 
         return arr;
     }
-    
-    public static int[] removeFrom(int[] arr, int data){
+
+    public static int[] removeFrom(int[] arr, int data) {
         int[] newArr = new int[arr.length - 1];
         int i = 0;
         for (int item : arr) {
-            if(item != data) {
+            if (item != data) {
                 newArr[i] = item;
             }
             i++;
-            if(i >= newArr.length) break;
+            if (i >= newArr.length) {
+                break;
+            }
         }
         return newArr;
     }
-    
+
     public static int[] insertTo(int arr[], int data) {
         int[] newArr = Arrays.copyOf(arr, arr.length + 1);
         newArr[arr.length] = data;

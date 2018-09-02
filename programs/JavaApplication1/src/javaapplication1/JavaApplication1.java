@@ -144,8 +144,14 @@ public class JavaApplication1 {
         
         //HackerRank.minimumBribes(new int[]{2,5,1,3,4});
         
-        boolean won = CrackingCodingInterview.Sol19_2.hasWonTicTacToe();
-        System.out.print(won);
+        //boolean won = CrackingCodingInterview.Sol19_2.hasWonTicTacToe();
+        //System.out.print(won);
+        
+        //StringAlgo.DidNotUnderstandAtFirstLook.permutation("abc");
+        
+        int arr[] = new int[]{2,5,1,7,4,3,1,9,2};
+        Array.Sort.bubble(arr);
+        Array.print(arr);
     }
 
 }

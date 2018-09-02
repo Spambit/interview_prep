@@ -14,7 +14,7 @@ public class CrackingCodingInterview {
     public static class Sol19_2 {
 
         //Design an algorithm to figure out if someone has won in a game of tic-tac-toe.
-        private static char[][] board = new char[][]{
+        private final static char[][] board = new char[][]{
             {'o', 'x', 'o'},
             {'o', 'x', 'o'},
             {'x', 'o', 'x'}

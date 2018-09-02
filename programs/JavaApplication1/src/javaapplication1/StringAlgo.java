@@ -15,6 +15,23 @@ import java.util.LinkedList;
  * @author sambit
  */
 public class StringAlgo {
+    
+    public static class DidNotUnderstandAtFirstLook {
+        public static void permutation(String str) {
+            permutationInternal(str, "");
+        }
+        
+        private static void permutationInternal(String str, String prefix) {
+            if(str.length() == 0 ) {
+                System.out.print(prefix+" ");
+            }else {
+                for(int i = 0 ; i< str.length(); i++) {
+                    String rem = str.substring(0,i) + str.substring(i+1);
+                    permutationInternal(rem, prefix+str.charAt(i));
+                }
+            }
+        }
+    }
 
     public static class CommonAlgo {
 
