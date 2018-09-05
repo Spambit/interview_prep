@@ -149,9 +149,38 @@ public class JavaApplication1 {
         
         //StringAlgo.DidNotUnderstandAtFirstLook.permutation("abc");
         
-        int arr[] = new int[]{2,5,1,7,4,3,1,9,2};
-        Array.Sort.bubble(arr);
-        Array.print(arr);
+        //int arr[] = new int[]{2,5,1,7,4,3,1,9,2};
+        //Array.Sort.bubble(arr);
+        //Array.print(arr);
+        
+        //int arr[] = new int[]{2,5,1,7,4,3,1,9,2};
+        //Array.moveAll0sAtEnd(arr);
+        //Array.print(arr);
+        
+//        int arr1[] = new int[]{2,5,6,9,9};
+//        int arr2[] = new int[]{0,1,2,8};
+//        int arr3[] = Array.Sort.mergeTwoSortedArray(arr1, arr2);
+
+//        int arr[] = new int[]{2,5,1,7,4,3,1,9,2};
+//        Array.Sort.bubble(arr);
+//        Array.print(arr);
+//        System.out.println("");
+//        int foundIndex = Array.Search.binarySearch(arr, 54);
+//        System.out.print(foundIndex);
+
+
+//          int arr[] = new int[]{5,6,7,8,9};
+//          Array.Search.Range range = Array.Search.Range.make(5, 5);
+//          boolean found = Array.Search.rangeSearch(arr, range);
+//          System.out.print(found);
+
+//            int arr[] = new int[]{5,6,7,8,9};
+//            Array.Rotate.left(arr, 3);
+//            Array.print(arr);
+
+           int arr[] = new int[] {4,8,9,10,45,78};
+           int pos = Array.Search.positionAtWhichItemShouldBeInserted(arr, 10);
+           System.out.print(pos);
     }
 
 }

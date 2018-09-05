@@ -14,9 +14,218 @@ import java.util.HashSet;
  * @author sambit
  */
 public class Array {
+    
+    public static class Rotate {
+        public static void left(int arr[], int pos) {
+            pos = pos % arr.length ;
+            for(int i = 0; i < pos; i++) {
+                rotateLeftByOnePlace(arr);
+            }
+        }
+        
+        private static void rotateLeftByOnePlace(int arr[]) {
+            int data = arr[0];
+            int j = 1 , i = 0 ;
+            for(; j < arr.length; j++, i++) {
+                arr[i] = arr[j];
+            }
+            
+            arr[j - 1] = data;
+        }
+    }
+    
+    public static class Search {   
+        public static class Range {
+            int start;
+            int end;
+            private Range(int start,int end) {
+                this.start = start;
+                this.end = end;
+            }
+            public static Range make(int start, int end) {
+                return new Range(start,end);
+            }
+            public boolean isDataInRange(int data) {
+                return data > start && data < end;
+            }
+            
+            public boolean startsWith(int data) {
+                return data == start;
+            }
+            
+            public boolean endsWith(int data) {
+                return data == end;
+            }
+                   
+        }
+        
+        public static int positionAtWhichItemShouldBeInserted(int sortedArr[], int data) {
+            return positionAtWhichItemShouldBeInsertedInternal(sortedArr, data, 0, sortedArr.length - 1);
+        }
+        
+        private static int positionAtWhichItemShouldBeInsertedInternal(int sortedArr[], int data, int startIndex, int endIndex) {
+            int mid = (int) ((startIndex + endIndex) / 2);
+            if(data == sortedArr[mid]) {
+                return mid;
+            }
+            
+            if(mid - 1 > 0 && data < sortedArr[mid] && sortedArr[mid - 1] < data) {
+                return mid;
+            }
+            
+            if(mid + 1 < sortedArr.length - 1 && data > sortedArr[mid] && data < sortedArr[mid + 1]) {
+                return mid + 1;
+            }
+            
+            if(mid == 0 && sortedArr[mid] > data ) {
+                return mid;
+            }
+            
+            if(mid >= sortedArr.length - 2  && sortedArr[mid] < data ){
+                return sortedArr.length ;
+            }
+            
+            if(data > sortedArr[mid]){
+                return positionAtWhichItemShouldBeInsertedInternal(sortedArr, data, mid, endIndex);
+            }else {
+                return positionAtWhichItemShouldBeInsertedInternal(sortedArr, data, startIndex, mid);
+            }
+        }
+        
+        public static int binarySearch(int []arr, int data){
+            if(!isSorted(arr, 0 , arr.length - 1)) {
+                return -1;
+            }
+            return binarySearchInternal(arr, data, 0, arr.length - 1,-1);
+        }
+        
+        public static boolean rangeSearch(int arr[], Range range) {
+            return naiveRangeSearch(arr, range);
+        }
+        
+        private static boolean naiveRangeSearch(int arr[], Range range) {
+            boolean transactionStarted = false , transactionEnd = false;
+            for(int i  =0 ; i < arr.length ;i++) {
+                int data = arr[i];
+                boolean startsWith = range.startsWith(data);
+                boolean endsWith = range.endsWith(data);
+                
+                if(startsWith) {
+                    transactionStarted = true;
+                    transactionEnd = false;
+                }
+                
+                if(endsWith){
+                    transactionEnd = true;
+                }
+                
+                if(transactionStarted && transactionEnd) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        private static int binarySearchInternal(int arr[],int data, int startIndex, int endIndex, int foundIndex){            
 
+            int midIndex = (int) ((startIndex + endIndex) / 2);
+            if(arr[midIndex] == data) {
+                return midIndex;
+            }
+            
+            if(midIndex == startIndex) {
+                return -1;
+            }
+            
+            if(data > arr[midIndex]) {
+                foundIndex = binarySearchInternal(arr, data, midIndex + 1, endIndex, foundIndex);
+            }else {
+                foundIndex = binarySearchInternal(arr, data, startIndex, midIndex - 1, foundIndex);
+            }
+            
+            return foundIndex;
+        }
+        
+        private static boolean isSorted(int arr[],int startIndex, int endIndex) {
+            int data = arr[startIndex];
+            for(int i = startIndex + 1; i < endIndex; i++ ) {
+                if(data > arr[i]) {
+                    return false;
+                }
+                data = arr[i];
+            }
+            return true;
+        }
+    }
+    
+    public static void moveAll0sAtEnd(int arr[]) {
+       for(int i = 0; i < arr.length; i++) {
+           int data = arr[i];
+           if(data == 0) {
+               shiftArrayToLeftByOnePosition(arr, i + 1 , arr.length -1);
+               arr[arr.length - 1] = 0; 
+           }
+       }
+    }
+    
+    private static void shiftArrayToLeftByOnePosition(int arr[], int startIndex, int endIndex ) {
+        if(startIndex > arr.length - 1 || startIndex <= 0) {
+            return;
+        }
+        
+        for(int i = startIndex; i <= endIndex; i++) {
+            arr[i - 1] = arr[i];
+        }
+    }
+    
     public static class Sort {
-
+        
+        public static int[] mergeTwoSortedArray(int []arr1, int arr2[]) {
+            int newArr[] = new int[arr1.length + arr2.length];
+            return mergeInternal(newArr,arr1,0, arr1.length - 1, arr2, 0, arr2.length - 1);
+        }
+        
+        private static int[] mergeInternal(int dst[], int arr1[], int startIndex1, int endIndex1, int arr2[], int startIndex2, int endIndex2) {
+            int i , k , j ;
+            for( i = startIndex1, k = 0, j = startIndex2 ; k < dst.length ; k++) {
+                int arr1data = 0;
+                if(i <= endIndex1 ) {
+                    arr1data = arr1[i];
+                }
+                
+                int arr2data = 0;
+                if(j <= endIndex2 ) {
+                    arr2data = arr2[j];
+                }
+                
+                if(arr1data < arr2data) {
+                    dst[k] = arr1data;
+                    i++;
+                }else {
+                    dst[k] = arr2data;
+                    j++;
+                }
+                
+                if(i == arr1.length && j < arr2.length) {
+                    copyItems(arr2, j, endIndex2, dst, k + 1);
+                    break;
+                }
+                
+                if(j == arr2.length && i < arr1.length) {
+                    copyItems(arr1, i, endIndex1, dst, k + 1);
+                    break;
+                }
+            }
+            return dst;
+        }
+        
+        private static void copyItems(int src[], int startIndex, int endIndex, int dst[], int dstStartIndex) {
+            for(int i = startIndex, j = dstStartIndex; i <= endIndex && j < dst.length; i++, j++) {
+                dst[j] = src[i];
+            }
+        }
+        
+        
         public static int[] insertion(int[] arr) {
             for (int i = 1; i < arr.length; i++) {
                 int data = arr[i];
