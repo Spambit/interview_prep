@@ -5,6 +5,7 @@
  */
 package javaapplication1;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -195,8 +196,9 @@ public class JavaApplication1 {
 //        }
 
         int arr[] = new int[] {6,2,-5,9,4,3,-1,3};
-        Array.Pair pair = Array.closestPairWithSum(arr, -8 );
-        System.out.print(pair);
+        ArrayList<Integer> list = Array.closestTripletSum(arr, -7 );
+        //Array.print(arr);
+        System.out.println(list);
     }
 
 }
