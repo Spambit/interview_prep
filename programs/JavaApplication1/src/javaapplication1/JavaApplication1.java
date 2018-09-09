@@ -5,6 +5,8 @@
  */
 package javaapplication1;
 
+import java.util.HashSet;
+
 /**
  *
  * @author sambit
@@ -178,9 +180,23 @@ public class JavaApplication1 {
 //            Array.Rotate.left(arr, 3);
 //            Array.print(arr);
 
-           int arr[] = new int[] {4,8,9,10,45,78};
-           int pos = Array.Search.positionAtWhichItemShouldBeInserted(arr, 10);
-           System.out.print(pos);
+        //    int arr[] = new int[] {4,8,9,10,45,78};
+        //    int pos = Array.Search.positionAtWhichItemShouldBeInserted(arr, 10);
+        //    System.out.print(pos);
+
+        // int digits[] = new int[] {8,9};
+        // int newDigits[] = Array.addOneToVeryBigNumber(digits); 
+        // Array.print(newDigits);
+
+        //int arr[] = new int[] {6,2,-5,9,4,3,-1,3};
+//        HashSet<Integer> seq = Array.largestConsecutiveSequence(arr);
+//        for(Integer val: seq) {
+//            System.out.print(val+" ");
+//        }
+
+        int arr[] = new int[] {6,2,-5,9,4,3,-1,3};
+        Array.Pair pair = Array.closestPairWithSum(arr, -8 );
+        System.out.print(pair);
     }
 
 }

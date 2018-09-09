@@ -8,13 +8,203 @@ package javaapplication1;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+
+import javafx.util.Pair;
 
 /**
  *
  * @author sambit
  */
 public class Array {
+
+    public static class Pair {
+        int item1;
+        int item2;
+        public static Pair create(int one, int two) {
+            Pair p = new Pair();
+            p.item1 = one;
+            p.item2 = two;
+            return p;
+        }
+
+        public int getSum() {
+            return item1 + item2;
+        }
+        
+        public String toString() {
+            return " ( " + item1+ " , "+item2+" ) ";
+        }
+    }
+
+    public static Pair closestPairWithSum(int arr[], int target) {
+        ArrayList<Integer> sortedList = createSortedListWithArr(arr);
+        return closestPairWithSumInternal(sortedList, target);
+    }
     
+    public static Pair pairWithSum(int arr[], int target) {
+        ArrayList<Integer> sortedList = createSortedListWithArr(arr);
+        for(int i = 0 , j = sortedList.size() - 1; i < j;){
+            int sum = sortedList.get(i) + sortedList.get(j);
+            if(sum == target) {
+                return Pair.create( sortedList.get(i),  sortedList.get(j));
+            }
+            if(sum > target) {
+                j--;
+            }else {
+                i++;
+            }
+        }
+        return null;
+    }
+    
+    private static ArrayList<Integer> createSortedListWithArr(int arr[]) {
+        arr = Sort.bubble(arr);
+        
+        ArrayList<Integer> sortedList = new ArrayList();
+        for(Integer item : arr) {
+            sortedList.add(item);
+        }
+        return sortedList;
+    }
+
+    public static Pair closestPairWithSumInternal(ArrayList<Integer> sortedList, int target) {
+        Pair foundPair = null;
+        int smallestDistnceTowardsTarget = 0 ;
+        int currentDistanceTowardsTarget = 0;
+        int i = 0, j = sortedList.size() - 1 ;
+        for(; i < j  ;) {
+            int leadingItem = sortedList.get(i);
+            int trailingItem = sortedList.get(j);
+            int sum = leadingItem + trailingItem;
+            
+            if(sum == target) {
+               foundPair = Pair.create(leadingItem,trailingItem);
+               break;
+            }else if(sum > target) {
+                currentDistanceTowardsTarget = Math.abs(target - sum);
+                j--;
+            }else {
+                currentDistanceTowardsTarget = Math.abs(target - sum);
+                i++;
+            }
+            if(smallestDistnceTowardsTarget == 0 || smallestDistnceTowardsTarget > currentDistanceTowardsTarget){
+                smallestDistnceTowardsTarget = currentDistanceTowardsTarget;
+                foundPair = Pair.create(leadingItem,trailingItem);
+            }
+        }
+        return foundPair;
+    }
+
+    public static HashSet<Integer> largestConsecutiveSequence(int arr[]) {
+        arr = Array.Sort.bubble(arr);
+        boolean transactionOn = true;
+        HashSet<Integer> workingSeq = new HashSet();
+        HashSet<Integer> stagingSeq = new HashSet();
+        for(int i = 0 , j = 1; j < arr.length ; i++, j++) {
+            if(arr[j] - arr[i] == 1) {
+                workingSeq.add(arr[i]);
+                workingSeq.add(arr[j]);
+            }else {
+                if(stagingSeq.size() < workingSeq.size()) {
+                    stagingSeq.clear();
+                    copyHashSet(workingSeq, stagingSeq);
+                }
+                
+                workingSeq.clear();
+            }
+        }
+
+        if(stagingSeq.size() < workingSeq.size()) {
+            stagingSeq.clear();
+            copyHashSet(workingSeq, stagingSeq);
+        }
+        return stagingSeq;
+    }
+
+    private static void copyHashSet(HashSet<Integer> src, HashSet<Integer> dst) {
+        for (Integer val : src  ) {
+            dst.add(val);
+        }
+    }
+
+    public static int[] addOneToNumber (int digits[]) {
+        return convertInternal(digits);
+    }
+    
+    public static int[] addOneToVeryBigNumber (int digits[]) {
+        return addOneToVeryBigNumberInternal(digits);
+    }
+
+    private static int[] addOneToVeryBigNumberInternal(int[] digits) {
+        int newDigits[] = new int[digits.length];
+        int carry = 1;
+        for(int i = digits.length - 1; i >= 0 ; i--) {
+            int val = digits[i] + carry;
+            if(val > 9){
+                carry = 1;
+                newDigits[i] = 0;
+            }else {
+                carry = 0;
+                newDigits[i] = val;
+            }
+        }
+        int newarr[] = newDigits;
+        if(carry == 1) {
+            newarr = new int[newDigits.length + 1];
+            for(int i = 1, j = 0 ; j < newDigits.length ;j++,i++) {
+                newarr[i] = newDigits[j];
+            }
+            newarr[0] = 1;
+        }
+       
+        return newarr;
+    }
+
+    private static int[] convertInternal(int digits[]) {
+        int number = convertToNumber(digits);
+        number += 1;
+        int newDigits[] = convertToDigitArray(number);
+        return newDigits;
+    }
+
+    private static int numberOfDigits(int number) {
+        int i = 1;
+        while((int) (number/10) != 0) {
+            number = (int) (number / 10);
+            i++;
+        }
+        return i;
+    }
+
+    private static int[] convertToDigitArray(int number) {
+        int numberOfDigits = numberOfDigits(number);
+        int arr[] = new int[numberOfDigits];
+        int multiplier = 1;
+        for(int i = 0; i < numberOfDigits - 1 ; i++){
+            multiplier *= 10;
+        }
+        for(int i = 0  ; i < arr.length ; i++) {
+            arr[i] = (int) (number / multiplier);
+            number %= multiplier;
+            multiplier /= 10;
+        }
+        return arr;
+    }
+
+    private static int convertToNumber(int digits[]) {
+        int num = 0;
+        for(int  i = digits.length - 1 , j = 0 ; i >= 0 ; i--, j++) {
+            int digit = digits[j];
+            int multiplier = 1;
+            for(int k = 1 ; k <= i; k++){
+                multiplier = multiplier * 10;
+            }
+            num += digit * multiplier;
+        }
+        return num;
+    }
+
     public static class Rotate {
         public static void left(int arr[], int pos) {
             pos = pos % arr.length ;
@@ -261,7 +451,6 @@ public class Array {
         private static void findMinAndSwapWithData(int arr[], int data, int dataIndex, int startIndex) {
             int indexOfMin = indexOfMin(arr, startIndex, arr.length - 1);
             int minDataAtRight = arr[indexOfMin];
-            System.out.println("Current index: "+dataIndex+ " current data : "+data+" minIndex "+indexOfMin+" minData: "+minDataAtRight);
             if(data > minDataAtRight) {
                 arr[dataIndex] = minDataAtRight;
                 arr[indexOfMin] = data;
