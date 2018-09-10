@@ -7,6 +7,7 @@ package javaapplication1;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -15,6 +16,99 @@ import java.util.List;
  * @author sambit
  */
 public class Array {
+
+    private static ArrayList<Integer> convertToDigitArrayAnother(int number){
+        int reminder = number % 10;
+        ArrayList<Integer>  list = new ArrayList();
+        int quot = (int) (number / 10);
+
+        if(quot == 0 && reminder != 0) {
+            list.add(number);
+            return list;
+        }
+
+        while(quot != 0) {
+            list.add(reminder);
+            reminder = quot % 10;
+            quot = (int) (quot / 10);
+        }
+        
+        list.add(reminder);
+
+        Collections.reverse(list);
+        return list;
+    }
+    private static int digit(int number, int position) {
+        ArrayList<Integer> convertedDigitArray = convertToDigitArrayAnother(number);
+        return convertedDigitArray.get(position);
+    }
+    public static List<Integer> bubbleSortAccordingToFirstDigit(List<Integer> A) {
+        for(int i = 0  ; i < A.size() - 1; i++ ) {
+            int current = A.get(i);
+            int smallest = current;
+            int smallestFirstDigit = digit(current,0);
+            int k = 0;
+            for( int j = i+1; j < A.size(); j++) {
+                //find the smallest in this
+                int data = A.get(j);
+                int firstDigit = digit(data,0);
+                if(smallestFirstDigit > firstDigit) {
+                    smallest = data;
+                    smallestFirstDigit = firstDigit;
+                    k = j;
+                }
+            }
+            //swap
+            if(current != smallest) {
+                A.set(k, current);
+                A.set(i, smallest);
+            }
+        }
+        return A;
+    }
+
+    public static String makeLargestNumberAsString(String number1, String number2) {
+        char ch1='a';
+        char ch2='a';
+        for(int i = 0 , j = 0; ;) {
+            if(i < number1.length()){
+                ch1 = number1.charAt(i);
+                i++;
+            }
+
+            if(j < number2.length()) {
+                ch2 = number2.charAt(j);
+                j++;
+            }
+
+            if(ch1 > ch2) {
+                return number1+number2;
+            }
+            if(ch2 > ch1) {
+                return number2+number1;
+            }
+
+            if(i >= number1.length() && j >= number2.length()) {
+                return number1+number2;
+            }
+        }
+    }
+
+    private static String largestNumberInternal(List<Integer> list){
+        String num1 = ""+list.get(0), num2 = "";
+        for(int j = 1; j < list.size(); j++) {
+            num2 = ""+list.get(j);
+            String biggestNumber = makeLargestNumberAsString(num1, num2);
+            num1 = biggestNumber;
+        }
+        return num1;
+    }
+    
+    // DO NOT MODIFY THE LIST. IT IS READ ONLY
+    public static String largestNumber(final List<Integer> A) {
+        List<Integer> sortedList = Array.bubbleSortAccordingToFirstDigit(A);
+        return largestNumberInternal(sortedList);
+    }
 
     public static ArrayList<Integer> closestTripletSum(int arr[], int target) {
         return naiveClosestTripletSum(arr, target);

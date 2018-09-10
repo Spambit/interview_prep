@@ -6,7 +6,9 @@
 package javaapplication1;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  *
@@ -195,10 +197,18 @@ public class JavaApplication1 {
 //            System.out.print(val+" ");
 //        }
 
-        int arr[] = new int[] {6,2,-5,9,4,3,-1,3};
-        ArrayList<Integer> list = Array.closestTripletSum(arr, -7 );
+        int arr[] = new int[] {19,2,1,9};
+        //ArrayList<Integer> list = Array.closestTripletSum(arr, -7 );
         //Array.print(arr);
-        System.out.println(list);
+        //System.out.println(list);
+        
+        List<Integer> list = new ArrayList();
+        for(Integer data : arr) {
+           list.add(data);
+        }
+        //System.out.println(Array.bubbleSortAccordingToFirstDigit(list));
+        //System.out.println(Array.bubbleSort(list));
+        System.out.println(Array.largestNumber(list));
     }
 
 }
