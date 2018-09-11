@@ -17,49 +17,209 @@ import java.util.List;
  */
 public class Array {
 
-    private static ArrayList<Integer> convertToDigitArrayAnother(int number){
+    private static ArrayList<Integer> multiplyDigitArrayBySingleDigit(int[] digits, int singleDigit) {
+        ArrayList<Integer> result = new ArrayList();
+        if(singleDigit == 0) {
+            for(Integer digit : digits ) {
+                result.add(0);
+            }
+            return result;
+        }
+
+        int carry = 0;
+        for(int i = digits.length - 1; i >= 0 ; i--) {
+            int digit = digits[i];
+            int multipliedValue = digit * singleDigit + carry;
+            carry = 0;
+            int reminder = multipliedValue % 10;
+            int quot = (int) (multipliedValue / 10);
+            if(reminder != 0 && quot == 0) {
+                //single digit;
+            } else {
+                carry = quot;
+            }
+            result.add(reminder);
+        }
+        if(carry != 0) {
+            result.add(carry);
+        }
+        Collections.reverse(result);
+        return result;
+    }
+    
+    private static ArrayList<Integer> addDigitsArrayOfSameLength(int []number1, int []number2) {
+        ArrayList<Integer> list = new ArrayList();
+        int sum = 0, carry = 0;
+        for(int i = number1.length - 1; i >= 0; i--) {
+            sum = number1[i] + number2[i] + carry ;
+            carry = 0;
+            int quot = (int)(sum / 10);
+            int reminder = sum % 10;
+            if( reminder != 0 && quot == 0) {
+                //single digit
+            }else {
+                carry = 1;
+            }
+            list.add(reminder);
+        }
+        if(carry == 1) {
+            list.add(1);
+        }
+        Collections.reverse(list);
+        return list;
+    }
+
+    public static ArrayList<Integer> multiplyTwoArbitaryPrecisionIntegers(int number1[],int number2[]) {
+        ArrayList<ArrayList<Integer>> products = new ArrayList();
+        for(int i = number2.length -1 ; i >= 0 ; i-- ) {
+            ArrayList<Integer> singleRowResult = multiplyDigitArrayBySingleDigit(number1, number2[i]);
+            for(int j = 0 ; j < number2.length - i - 1; j++) {
+                singleRowResult.add(0);
+            }
+            products.add(singleRowResult);
+        }
+        //products = makeLargestLengthByAppendingZeroAtBeginning(products);
+        ArrayList<Integer> sum = products.get(0);
+        for(int i = 1 ;i < products.size() ; i++) {
+            ArrayList<Integer> currentList = products.get(i);
+            
+            ArrayList<ArrayList<Integer>> dummy = new ArrayList();
+            dummy.add(currentList);
+            dummy.add(sum);
+            dummy = makeLargestLengthByAppendingZeroAtBeginning(dummy);
+            sum = addDigitsArrayOfSameLength(convertIntegerArrayToIntArray(dummy.get(0)), convertIntegerArrayToIntArray(dummy.get(1)));
+        }
+        return sum;
+    }
+
+    private static int[] convertIntegerArrayToIntArray(ArrayList<Integer> objects) {
+        int arr[] = new int[objects.size()];
+        int i = 0;
+        for(Integer item: objects) {
+            arr[i] = item;
+            i++;
+        }
+        return arr;
+    }
+
+    private static ArrayList<ArrayList<Integer>> makeLargestLengthByAppendingZeroAtBeginning(ArrayList<ArrayList<Integer>> lists) {
+        int maxLength = 0;
+        
+        for(ArrayList<Integer> list : lists) {
+            int size = list.size();
+            if(maxLength < size) {
+                maxLength = size;
+            }
+        }
+
+        for(int j = 0 ; j < lists.size(); j++) {
+            ArrayList<Integer> list = lists.get(j);
+            ArrayList<Integer> newList = new ArrayList();
+            for(int i = 0 ; i < maxLength - list.size() ; i++) {
+                newList.add(0);
+            }
+            newList.addAll(list);
+            lists.set(j,newList);
+        }
+
+        return lists;
+    }
+
+    public static ArrayList<Integer> sortArrayWithZerosAndTwos(int arr[]) { //not completed - 
+        int zeroTracker = -1, oneTracker = -1, twoTracker = -1;
+        for (int i = 0, j = arr.length - 1; i < arr.length; i++, j++) {
+            if (arr[i] == 0) {
+                if (zeroTracker == -1) {
+                    zeroTracker = i;
+                }
+            } else if (arr[i] == 1) {
+                if (oneTracker == -1) {
+                    oneTracker = i;
+                }
+            } else if (arr[i] == 2) {
+                if (twoTracker == -1) {
+                    twoTracker = i;
+                }
+            }
+
+            if (zeroTracker != -1 && oneTracker != -1 && twoTracker != -1) {
+                break;
+            }
+        }
+
+        for (int i = 0; i < arr.length; i++) {
+            int possibleSwapZeroIndex = arr[zeroTracker] != 0 ? zeroTracker : -1;
+            int possibleSwapOneIndex = arr[oneTracker] != 0 ? oneTracker : -1;
+            int possibleSwapTwoIndex = arr[twoTracker] != 0 ? twoTracker : -1;
+
+            if (possibleSwapZeroIndex != -1 && possibleSwapOneIndex != -1) {
+                swap(arr, possibleSwapZeroIndex, possibleSwapOneIndex);
+            }
+            
+            if (possibleSwapZeroIndex != -1 && possibleSwapTwoIndex != -1) {
+                swap(arr, possibleSwapZeroIndex, possibleSwapTwoIndex);
+            } 
+            
+            if (possibleSwapOneIndex != -1 && possibleSwapTwoIndex != -1) {
+                swap(arr, possibleSwapOneIndex, possibleSwapTwoIndex);
+            }
+            
+        }
+
+        return null;
+    }
+
+    private static void swap(int arr[], int oneIndex, int twoIndex) {
+        int temp = arr[oneIndex];
+        arr[oneIndex] = arr[twoIndex];
+        arr[twoIndex] = temp;
+    }
+
+    private static ArrayList<Integer> convertToDigitArrayAnother(int number) {
         int reminder = number % 10;
-        ArrayList<Integer>  list = new ArrayList();
+        ArrayList<Integer> list = new ArrayList();
         int quot = (int) (number / 10);
 
-        if(quot == 0 && reminder != 0) {
+        if (quot == 0 && reminder != 0) {
             list.add(number);
             return list;
         }
 
-        while(quot != 0) {
+        while (quot != 0) {
             list.add(reminder);
             reminder = quot % 10;
             quot = (int) (quot / 10);
         }
-        
+
         list.add(reminder);
 
         Collections.reverse(list);
         return list;
     }
+
     private static int digit(int number, int position) {
         ArrayList<Integer> convertedDigitArray = convertToDigitArrayAnother(number);
         return convertedDigitArray.get(position);
     }
+
     public static List<Integer> bubbleSortAccordingToFirstDigit(List<Integer> A) {
-        for(int i = 0  ; i < A.size() - 1; i++ ) {
+        for (int i = 0; i < A.size() - 1; i++) {
             int current = A.get(i);
             int smallest = current;
-            int smallestFirstDigit = digit(current,0);
+            int smallestFirstDigit = digit(current, 0);
             int k = 0;
-            for( int j = i+1; j < A.size(); j++) {
-                //find the smallest in this
+            for (int j = i + 1; j < A.size(); j++) {
+                // find the smallest in this
                 int data = A.get(j);
-                int firstDigit = digit(data,0);
-                if(smallestFirstDigit > firstDigit) {
+                int firstDigit = digit(data, 0);
+                if (smallestFirstDigit > firstDigit) {
                     smallest = data;
                     smallestFirstDigit = firstDigit;
                     k = j;
                 }
             }
-            //swap
-            if(current != smallest) {
+            // swap
+            if (current != smallest) {
                 A.set(k, current);
                 A.set(i, smallest);
             }
@@ -68,42 +228,42 @@ public class Array {
     }
 
     public static String makeLargestNumberAsString(String number1, String number2) {
-        char ch1='a';
-        char ch2='a';
-        for(int i = 0 , j = 0; ;) {
-            if(i < number1.length()){
+        char ch1 = 'a';
+        char ch2 = 'a';
+        for (int i = 0, j = 0;;) {
+            if (i < number1.length()) {
                 ch1 = number1.charAt(i);
                 i++;
             }
 
-            if(j < number2.length()) {
+            if (j < number2.length()) {
                 ch2 = number2.charAt(j);
                 j++;
             }
 
-            if(ch1 > ch2) {
-                return number1+number2;
+            if (ch1 > ch2) {
+                return number1 + number2;
             }
-            if(ch2 > ch1) {
-                return number2+number1;
+            if (ch2 > ch1) {
+                return number2 + number1;
             }
 
-            if(i >= number1.length() && j >= number2.length()) {
-                return number1+number2;
+            if (i >= number1.length() && j >= number2.length()) {
+                return number1 + number2;
             }
         }
     }
 
-    private static String largestNumberInternal(List<Integer> list){
-        String num1 = ""+list.get(0), num2 = "";
-        for(int j = 1; j < list.size(); j++) {
-            num2 = ""+list.get(j);
+    private static String largestNumberInternal(List<Integer> list) {
+        String num1 = "" + list.get(0), num2 = "";
+        for (int j = 1; j < list.size(); j++) {
+            num2 = "" + list.get(j);
             String biggestNumber = makeLargestNumberAsString(num1, num2);
             num1 = biggestNumber;
         }
         return num1;
     }
-    
+
     // DO NOT MODIFY THE LIST. IT IS READ ONLY
     public static String largestNumber(final List<Integer> A) {
         List<Integer> sortedList = Array.bubbleSortAccordingToFirstDigit(A);
@@ -656,6 +816,57 @@ public class Array {
 
     public static class Sort {
 
+        private static boolean isSuitableForCountingSort(int arr[]) {
+            for(Integer data : arr) {
+                if(data > 10) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private static int maxLinear(int arr[]) {
+            if(arr.length == 0) {
+                return 0;
+            }
+            int max = arr[0];
+            for(int data : arr) {
+                if(max < data) {
+                    max = data;
+                }
+            }
+            return max;
+        }
+
+        private static int[] countArrayWithInfoHowManyNumbersAreSmallerThan(int arr[]) {
+            int countArray[] = new int[maxLinear(arr) + 1];
+            for(int i = 0 ;i < arr.length ; i++) {
+                countArray[arr[i]] += 1; 
+            }
+
+            int prevSum = countArray[0];
+            for(int i = 1 ;i < countArray.length ; i++) {
+                prevSum += countArray[i];
+                countArray[i] = prevSum;
+            }
+            return countArray;
+        }
+
+        public static int[] countingSort(int arr[] ) {
+            if(!isSuitableForCountingSort(arr)) {
+                return null;
+            }
+
+            int result[] = new int[arr.length];
+            int countArray[] = countArrayWithInfoHowManyNumbersAreSmallerThan(arr);
+            for(int i = 0 ; i < arr.length; i++) {
+                int targetIndex = countArray[arr[i]] - 1;
+                result[targetIndex] = arr[i];
+                countArray[arr[i]] = targetIndex;
+            }
+            return result;
+        }
+
         public static int[] mergeTwoSortedArray(int[] arr1, int arr2[]) {
             int newArr[] = new int[arr1.length + arr2.length];
             return mergeInternal(newArr, arr1, 0, arr1.length - 1, arr2, 0, arr2.length - 1);
@@ -755,6 +966,13 @@ public class Array {
     }
 
     public static void print(int arr[]) {
+        if(arr == null) {
+            System.out.print("null");
+            return;
+        }
+        if(arr.length == 0) {
+            System.out.print("[]");
+        }
         for (int i = 0; i < arr.length; i++) {
             System.out.print(" " + arr[i] + " ");
         }
