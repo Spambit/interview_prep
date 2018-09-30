@@ -8,8 +8,11 @@ package javaapplication1;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+
+import javaapplication1.Array.Search.Range;
 
 /**
  *
@@ -17,77 +20,843 @@ import java.util.List;
  */
 public class Array {
 
+    public static void rotate2dArrayBy90DegRight() {
+        int arr[][] = new int[][] { new int[] { 1, 2, 3, 4 }, new int[] { 5, 6, 7, 8 }, new int[] { 9, 10, 11, 12 },
+                new int[] { 13, 14, 15, 16 } };
+        System.out.println(Arrays.deepToString(arr));
+        rorate2dArrayInternal(arr);
+        System.out.println(Arrays.deepToString(arr));
+    }
+
+    private static class Array2DCell {
+        int row;
+        int col;
+
+        Array2DCell(int r, int c) {
+            row = r;
+            col = c;
+        }
+    }
+
+    private enum Array2DTravelPath {
+        rowWiseTowardsRight {
+            public void advance(int steps, ArrayList<Array2DCell> trail, int wallPosition) {
+                Array2DCell currentCell = trail.get(trail.size() - 1);
+                int newRow = currentCell.row;
+                int newCol = currentCell.col + steps;
+                int exceedSteps = Math.abs(wallPosition - newCol);
+                if (exceedSteps > 0) {
+                    newRow = Math.abs(exceedSteps);
+                    newCol = wallPosition;
+                }
+                trail.add(new Array2DCell(newRow, newCol));
+            }
+        },
+
+        colWiseDownwards {
+            public void advance(int steps, ArrayList<Array2DCell> trail, int wallPosition) {
+                Array2DCell currentCell = trail.get(trail.size() - 1);
+                int newRow = currentCell.row + steps;
+                int newCol = currentCell.col;
+                int exceedSteps = Math.abs(wallPosition - newRow);
+                if (exceedSteps > 0) {
+                    newCol = wallPosition - Math.abs(exceedSteps);
+                    newRow = wallPosition;
+                }
+                trail.add(new Array2DCell(newRow, newCol));
+            }
+        },
+
+        rowWiseTowardsLeft {
+            public void advance(int steps, ArrayList<Array2DCell> trail, int wallPosition) {
+                Array2DCell currentCell = trail.get(trail.size() - 1);
+                int newRow = currentCell.row ;
+                int newCol = currentCell.col - steps;
+                if (newCol < 0) {
+                    newRow = wallPosition - Math.abs(newCol);
+                    newCol = 0;
+                }
+                trail.add(new Array2DCell(newRow, newCol));
+            }
+        },
+        colWiseUpwards {
+            public void advance(int steps, ArrayList<Array2DCell> trail, int wallPosition) {
+                Array2DCell currentCell = trail.get(trail.size() - 1);
+                int newRow = currentCell.row - steps ;
+                int newCol = currentCell.col ;
+                if (newRow < 0) {
+                    newCol = Math.abs(newRow);
+                    newRow = 0;
+                }
+                trail.add(new Array2DCell(newRow, newCol));
+            }
+        };
+        public void advance(int steps, ArrayList<Array2DCell> trail, int wallPosition) {
+
+        }
+    }
+
+    private static void rorate2dArrayInternal(int arr[][]) {
+        int layer = 0, size = arr.length;
+        Array2DTravelPath[] paths = new Array2DTravelPath[] { Array2DTravelPath.rowWiseTowardsRight,
+                Array2DTravelPath.colWiseDownwards, Array2DTravelPath.rowWiseTowardsLeft,
+                Array2DTravelPath.colWiseUpwards };
+        for (; layer < arr.length / 2; layer++) {
+            size = size - layer - 1;
+            int j = layer;
+            do {
+                // int replaceWith = arr[layer][j];
+                ArrayList<Array2DCell> trail = new ArrayList();
+                trail.add(new Array2DCell(layer, j));
+                for (Array2DTravelPath path : paths) {
+                    path.advance(size, trail, arr.length - 1 - layer);
+                }
+
+                int replaceWith = arr[trail.get(0).row][trail.get(0).col];
+                for (int i = 1; i < trail.size(); i++) {
+                    Array2DCell current = trail.get(i);
+                    int replacedData = arr[current.row][current.col];
+                    arr[current.row][current.col] = replaceWith;
+                    System.out.println("Replaced data :"+replacedData+" with :"+replaceWith);
+                    replaceWith = replacedData;
+                }
+                System.out.println();
+                j++;
+            } while(j < size);
+        }
+    }
+
+    public static int smallestMissingNumber(int unsortedArrWithPositiveAndNegative[]) {
+        int onlyPositives[] = null;// allPositiveNumbers(unsortedArrWithPositiveAndNegative);
+        return smallestMissingNumber(onlyPositives);
+    }
+
+    private static int maxSumOfConsecuitive(int start, int count) {
+        int end = (count - 1) * start;
+        int sum = (int) ((count * (end + start)) / 2);
+        return sum;
+    }
+
+    private static class MissingNumberInfo {
+        int missing;
+        int totalSum;
+        int smallest;
+
+        public static MissingNumberInfo create(int missing, int totalSum, int smallest) {
+            MissingNumberInfo info = new MissingNumberInfo();
+            info.missing = missing;
+            info.totalSum = totalSum;
+            info.smallest = smallest;
+            return info;
+        }
+    }
+
+    private static MissingNumberInfo smallestMissingNumberInternal(int positiveNumberArr[], int index) {
+        if (index >= positiveNumberArr.length - 1) {
+            return MissingNumberInfo.create(0, positiveNumberArr[index], positiveNumberArr[index]);
+        }
+
+        MissingNumberInfo info = smallestMissingNumberInternal(positiveNumberArr, index + 1);
+
+        int current = positiveNumberArr[index];
+        int prev = info.totalSum;
+        int sum = current + prev;
+
+        if (current < info.smallest) {
+            info.smallest = current;
+        }
+
+        int count = positiveNumberArr.length - index;
+        int maxPossibleSum = maxSumOfConsecuitive(info.smallest, count);
+
+        int missing = Math.abs(maxPossibleSum - sum);
+        if (missing > 1) {
+            // not consecutive
+            missing = info.smallest + 1;
+        }
+
+        return MissingNumberInfo.create(missing, sum, info.smallest);
+    }
+
+    private static int sudukuBoard[][] = new int[][] { new int[] { 0, 0, 4, 0 }, new int[] { 4, 0, 3, 0 },
+            new int[] { 0, 4, 0, 3 }, new int[] { 0, 2, 0, 0 } };
+
+    private static final int MAX_NUMBER = sudukuBoard.length;
+    private static int[] possibleValues = new int[] { 1, 2, 3, MAX_NUMBER };
+
+    private static int fillPosition(SudukuCell cell, int board[][], HashSet<Integer> excludeList) {
+        if (cell.prefilled) {
+            return -1;
+        }
+        return cell.makeGuess(board, excludeList);
+    }
+
+    private static class SudukuCell {
+        int row;
+        int col;
+        boolean prefilled;
+
+        public static SudukuCell create(int row, int col, boolean prefilled) {
+            SudukuCell cell = new SudukuCell();
+            cell.row = row;
+            cell.col = col;
+            cell.prefilled = prefilled;
+            return cell;
+        }
+
+        public static SudukuCell create(int row, int col) {
+            SudukuCell cell = new SudukuCell();
+            cell.row = row;
+            cell.col = col;
+            return cell;
+        }
+
+        public boolean isAlreadyFilled(int board[][]) {
+            return board[this.row][this.col] != 0;
+        }
+
+        public int getData(int board[][]) {
+            return board[row][col];
+        }
+
+        public int makeGuess(int board[][], HashSet<Integer> excludeNumbers) {
+            ArrayList<Integer> rowWiseFilledNumbers = rowWiseFilledNumbers(board);
+            ArrayList<Integer> colWiseFilledNumbers = colWiseFilledNumbers(board);
+            ArrayList<Integer> squareWiseFilledNumbers = squareWiseFilledNumbers(board);
+            HashSet<Integer> allNumbersThatAreAlreadyUsed = new HashSet(rowWiseFilledNumbers);
+            allNumbersThatAreAlreadyUsed.addAll(colWiseFilledNumbers);
+            allNumbersThatAreAlreadyUsed.addAll(squareWiseFilledNumbers);
+            allNumbersThatAreAlreadyUsed.addAll(excludeNumbers);
+            for (int i = 1; i <= MAX_NUMBER; i++) {
+                if (!allNumbersThatAreAlreadyUsed.contains(i)) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        private ArrayList<Integer> rowWiseFilledNumbers(int board[][]) {
+            ArrayList<Integer> filledNumbers = new ArrayList();
+            for (Integer data : board[row]) {
+                if (data != 0) {
+                    filledNumbers.add(data);
+                }
+            }
+            return filledNumbers;
+        }
+
+        private ArrayList<Integer> colWiseFilledNumbers(int board[][]) {
+            ArrayList<Integer> filledNumbers = new ArrayList();
+            for (int i = 0; i < board.length; i++) {
+                int row[] = board[i];
+                int data = row[this.col];
+                if (data != 0) {
+                    filledNumbers.add(data);
+                }
+            }
+            return filledNumbers;
+        }
+
+        private ArrayList<Integer> squareWiseFilledNumbers(int board[][]) {
+            return SudukuSquare.squareWiseFilledNumbers(board, this);
+        }
+
+        public boolean isRowWiseValid(int number, int board[][]) {
+            ArrayList<Integer> filledNumbers = rowWiseFilledNumbers(board);
+            return number <= MAX_NUMBER && !filledNumbers.contains(number);
+        }
+
+        public boolean isColWiseValid(int number, int board[][]) {
+            ArrayList<Integer> filledNumbers = colWiseFilledNumbers(board);
+            return number <= MAX_NUMBER && !filledNumbers.contains(number);
+        }
+
+        public boolean isSquareWiseValid(int number, int board[][]) {
+            ArrayList<Integer> filledNumbers = SudukuSquare.squareWiseFilledNumbers(board, this);
+            return number <= MAX_NUMBER && !filledNumbers.contains(number);
+        }
+    }
+
+    private static class SudukuSquare {
+        SudukuCell start;
+        SudukuCell end;
+
+        private static SudukuSquare create(SudukuCell start, SudukuCell end) {
+            SudukuSquare square = new SudukuSquare();
+            square.start = start;
+            square.end = end;
+            return square;
+        }
+
+        private static SudukuSquare container(SudukuCell cell) {
+            ArrayList<SudukuSquare> list = squares();
+            for (SudukuSquare square : list) {
+                if (Math.abs(square.start.row - cell.row) <= 1) {
+                    if (Math.abs(square.start.col - cell.col) <= 1) {
+                        return square;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static ArrayList<SudukuSquare> squares() {
+            ArrayList<SudukuSquare> squares = new ArrayList();
+
+            squares.add(SudukuSquare.create(SudukuCell.create(0, 0), SudukuCell.create(1, 1)));
+            squares.add(SudukuSquare.create(SudukuCell.create(0, 2), SudukuCell.create(1, 3)));
+            squares.add(SudukuSquare.create(SudukuCell.create(2, 0), SudukuCell.create(3, 1)));
+            squares.add(SudukuSquare.create(SudukuCell.create(2, 2), SudukuCell.create(3, 3)));
+
+            /*
+             * squares.add(SudukuSquare.create(SudukuCell.create(0, 0), SudukuCell.create(2,
+             * 2))); squares.add(SudukuSquare.create(SudukuCell.create(0, 3),
+             * SudukuCell.create(2, 5)));
+             * squares.add(SudukuSquare.create(SudukuCell.create(0, 6), SudukuCell.create(2,
+             * 8)));
+             * 
+             * squares.add(SudukuSquare.create(SudukuCell.create(3, 0), SudukuCell.create(5,
+             * 2))); squares.add(SudukuSquare.create(SudukuCell.create(3, 3),
+             * SudukuCell.create(5, 5)));
+             * squares.add(SudukuSquare.create(SudukuCell.create(3, 6), SudukuCell.create(5,
+             * 8)));
+             * 
+             * squares.add(SudukuSquare.create(SudukuCell.create(6, 0), SudukuCell.create(8,
+             * 2))); squares.add(SudukuSquare.create(SudukuCell.create(6, 3),
+             * SudukuCell.create(8, 5)));
+             * squares.add(SudukuSquare.create(SudukuCell.create(6, 6), SudukuCell.create(8,
+             * 8)));
+             */
+            return squares;
+        }
+
+        public static ArrayList<Integer> squareWiseFilledNumbers(int board[][], SudukuCell cell) {
+            ArrayList<Integer> list = new ArrayList();
+            SudukuSquare square = container(cell);
+            for (int i = square.start.row; i <= square.end.row; i++) {
+                for (int j = square.start.col; j <= square.end.col; j++) {
+                    int data = board[i][j];
+                    if (data != 0) {
+                        list.add(data);
+                    }
+                }
+            }
+            return list;
+        }
+    }
+
+    private static ArrayList<ArrayList<SudukuCell>> amendedBoard = new ArrayList();
+
+    private static ArrayList<ArrayList<SudukuCell>> amendedBoard(int[][] board) {
+        if (amendedBoard.size() != 0) {
+            return amendedBoard;
+        }
+
+        for (int i = 0; i < board.length; i++) {
+            ArrayList<SudukuCell> row = new ArrayList();
+            for (int j = 0; j < board[0].length; j++) {
+                row.add(SudukuCell.create(i, j, board[i][j] != 0));
+            }
+            amendedBoard.add(row);
+        }
+        return amendedBoard;
+    }
+
+    public static boolean validSuduku() {
+        HashSet<Integer> excludeNumbers = new HashSet();
+        ArrayList<ArrayList<SudukuCell>> board = amendedBoard(sudukuBoard);
+        int row = 0, col = 0;
+        boolean movedUpwardInBackwardDirection = false;
+        for (; row < board.size();) {
+            ArrayList<SudukuCell> boardRow = board.get(row);
+
+            for (; col < boardRow.size();) {
+                SudukuCell cell = boardRow.get(col);
+                int guess = fillPosition(cell, sudukuBoard, excludeNumbers);
+
+                if (cell.prefilled) {
+                    // ignore - prefilled
+                    col++;
+                } else if (guess == -1 && !cell.prefilled) {
+                    // not able to guess - traverse backward and guess another
+                    do {
+                        col--;
+                        if (col < 0) {
+                            break;
+                        }
+                    } while (boardRow.get(col).prefilled);
+                    if (col >= 0) {
+                        int oldValue = sudukuBoard[row][col];
+                        excludeNumbers.add(oldValue);
+                        sudukuBoard[row][col] = 0;
+                    }
+                } else {
+                    // guessed correctly - put on the board
+                    // boardRow.set(col, cell);
+                    sudukuBoard[row][col] = guess;
+                    col++;
+                    excludeNumbers.clear();
+                }
+
+                if (col < 0) {
+                    break;// if traversed too backward
+                }
+            }
+            if (col < 0 && row != 0) {
+                row--;
+                if (row < 0) {
+                    break;
+                }
+                col = sudukuBoard[0].length - 1;
+                movedUpwardInBackwardDirection = true;
+            } else {
+                row++;
+                col = 0;
+                excludeNumbers.clear();
+                movedUpwardInBackwardDirection = false;
+            }
+        }
+
+        if (col < 0 && row < 0) {
+            return false;// backward travese to correct the board not possible
+        }
+        return true;
+    }
+
+    private static ArrayList<ArrayItem> indexArrayThatHasZeroValue(int[] countArray) {
+        ArrayList<ArrayItem> list = new ArrayList();
+        for (int i = 0; i < countArray.length; i++) {
+            if (countArray[i] == 0) {
+                list.add(ArrayItem.create(countArray[i], i));
+            }
+        }
+        return list;
+    }
+
+    public static int[] permutationOfNumbers(int arr[]) {
+        if (arr.length <= 1) {
+            return arr;
+        }
+
+        int countingArr[] = new int[arr.length + 1];
+        ArrayList<ArrayItem> needChangeIndexes = new ArrayList();
+        for (int i = 0; i < arr.length; i++) {
+            int data = arr[i];
+            if (data <= arr.length) {
+                if (countingArr[data] == 1) {
+                    // duplicate
+                    needChangeIndexes.add(ArrayItem.create(data, i));
+                } else {
+                    countingArr[data] = 1;
+                }
+            } else {
+                needChangeIndexes.add(ArrayItem.create(data, i));
+            }
+        }
+
+        ArrayList<ArrayItem> availableValuesAsIndexes = indexArrayThatHasZeroValue(countingArr);
+
+        for (int i = 0; i < needChangeIndexes.size(); i++) {
+            ArrayItem item = needChangeIndexes.get(i);
+            int value = availableValuesAsIndexes.remove(availableValuesAsIndexes.size() - 1).index;
+            if (value != 0) {
+                arr[item.index] = value;
+            }
+        }
+        return arr;
+    }
+
+    public static ArrayList<MaxProfitStockInfo> maxProfitBuySellStockMultipleTimes(int arr[]) {
+        if (arr.length <= 1) {
+            return null;
+        }
+
+        ArrayList<MaxProfitStockInfo> list = new ArrayList();
+        int buy = -1, sell = -1;
+        int current = arr[0];
+        for (int i = 1; i < arr.length;) {
+            int next = arr[i];
+            if (next > current) {
+                if (buy == -1) {
+                    buy = i - 1;
+                }
+            } else {
+                if (buy != -1) {
+                    sell = i - 1;
+                    ArrayItem buyItem = ArrayItem.create(arr[buy], buy);
+                    ArrayItem sellItem = ArrayItem.create(arr[sell], sell);
+                    MaxProfitStockInfo info = MaxProfitStockInfo.create(buyItem, sellItem);
+                    list.add(info);
+
+                    buy = -1;
+                    sell = -1;
+                }
+            }
+            i++;
+            current = next;
+        }
+        if (buy != -1) {
+            sell = arr.length - 1;
+            ArrayItem buyItem = ArrayItem.create(arr[buy], buy);
+            ArrayItem sellItem = ArrayItem.create(arr[sell], sell);
+            MaxProfitStockInfo info = MaxProfitStockInfo.create(buyItem, sellItem);
+            list.add(info);
+
+            buy = -1;
+            sell = -1;
+        }
+        return list;
+    }
+
+    public static int maxProfit(ArrayList<MaxProfitStockInfo> list) {
+        int profit = 0;
+        for (int i = 0; i < list.size(); i++) {
+            MaxProfitStockInfo current = list.get(i);
+            profit += current.sell.data - current.buy.data;
+        }
+        return profit;
+    }
+
+    public static class ArrayItem {
+        int index = 0;
+        int data;
+
+        public static ArrayItem create(int data, int index) {
+            ArrayItem item = new ArrayItem();
+            item.data = data;
+            item.index = index;
+            return item;
+        }
+
+        public String toString() {
+            return "[ " + index + " ] = [ " + data + " ] ";
+        }
+    }
+
+    public static class MaxProfitStockInfo {
+        ArrayItem buy;
+        ArrayItem sell;
+
+        public static MaxProfitStockInfo create(ArrayItem buy, ArrayItem sell) {
+            MaxProfitStockInfo info = new MaxProfitStockInfo();
+            info.buy = buy;
+            info.sell = sell;
+            return info;
+        }
+
+        public String toString() {
+            return " Buy : " + buy + " Sell : " + sell;
+        }
+    }
+
+    private static ArrayItem maxInUnsortedArray(int arr[], int startIndex, int endIndex) {
+        int max = arr[startIndex];
+        int index = 0;
+        for (int i = startIndex + 1; i <= endIndex; i++) {
+            int current = arr[i];
+            if (max < current) {
+                max = current;
+                index = i;
+            }
+        }
+        ArrayItem maxItem = new ArrayItem();
+        maxItem.data = max;
+        maxItem.index = index;
+        return maxItem;
+    }
+
+    private static ArrayItem minInUnsortedArray(int arr[], int startIndex, int endIndex) {
+        int min = arr[startIndex];
+        int index = 0;
+        for (int i = startIndex + 1; i <= endIndex; i++) {
+            int current = arr[i];
+            if (min > current) {
+                min = current;
+                index = i;
+            }
+        }
+        ArrayItem minItem = new ArrayItem();
+        minItem.data = min;
+        minItem.index = index;
+        return minItem;
+    }
+
+    public static MaxProfitStockInfo maxProfitStockSellBuyOnce(int arr[]) {
+        ArrayItem allTimeLow = minInUnsortedArray(arr, 0, arr.length - 1);
+        ArrayItem allTimeHigh = maxInUnsortedArray(arr, 0, arr.length - 1);
+        if (allTimeLow.index < allTimeHigh.index) {
+            return MaxProfitStockInfo.create(allTimeLow, allTimeHigh);
+        }
+
+        ArrayItem highAtRightHandOfAllTimeLow = maxInUnsortedArray(arr, allTimeLow.index, arr.length - 1);
+        ArrayItem lowAtLeftHandOfAllTimeHigh = minInUnsortedArray(arr, 0, allTimeHigh.index);
+
+        int diffAtRight = highAtRightHandOfAllTimeLow.data - allTimeLow.data;
+        int diffAtLeft = allTimeHigh.data - lowAtLeftHandOfAllTimeHigh.data;
+
+        if (diffAtRight > diffAtLeft) {
+            return MaxProfitStockInfo.create(allTimeLow, highAtRightHandOfAllTimeLow);
+        } else {
+            return MaxProfitStockInfo.create(lowAtLeftHandOfAllTimeHigh, allTimeHigh);
+        }
+    }
+
+    public static int[] deleteDuplicatesFromSortedArrayWithoutExtraBuffer(int[] arr) {
+        if (arr == null) {
+            return arr;
+        }
+        if (arr != null && arr.length <= 1) {
+            return arr;
+        }
+
+        int current = arr[0];
+        int start = -1, end = -1, droppedItemsSize = 0;
+        for (int i = 1; i < arr.length; i++) {
+            int next = arr[i];
+            if (current == next) {
+                if (start == -1) {
+                    start = i - 1;
+                }
+                end = i;
+                continue;
+            }
+            if (start != -1 && end != -1) {
+                droppedItemsSize += end - start - 1;
+                dropItems(arr, start, end);
+                i = start - 1;
+                start = -1;
+                end = -1;
+            }
+            current = next;
+        }
+        if (start != -1 && end != -1) {
+            droppedItemsSize += end - start;
+            dropItems(arr, start, end);
+            start = -1;
+            end = -1;
+        }
+        // copy in a new array
+        int newSize = arr.length - droppedItemsSize;
+        int[] array = new int[newSize];
+        for (int i = 0; i < newSize; i++) {
+            array[i] = arr[i];
+        }
+        return array;
+    }
+
+    private static int dropItems(int[] arr, int startIndex, int endIndex) {
+        // System.out.println();
+        // System.out.println("Duplicate found between "+startIndex + " and endIndex:
+        // "+endIndex);
+        for (int i = startIndex, j = endIndex; i < arr.length && j < arr.length; i++, j++) {
+            arr[i] = arr[j];
+        }
+        // System.out.println("");
+        // Array.print(arr);
+        return startIndex;
+    }
+
+    private static HashMap<String, Integer> memoFrogJump = new HashMap();
+
+    private static void memoizeFrogJumpEntry(String key, int val) {
+        memoFrogJump.put(key, val);
+    }
+
+    private static Integer memoizedFrogJumpEntry(String key) {
+        return (Integer) memoFrogJump.get(key);
+    }
+
+    private static String createFrogJumpEntry(int levelOnRock, int currentIndex) {
+        return "jump(" + levelOnRock + "," + currentIndex + ")";
+    }
+
+    private static Integer alreadyCalculatedJumpFromCurrentRockLevel(int rockLevel, int currentIndex) {
+        String memoKey = createFrogJumpEntry(rockLevel, currentIndex);
+        Integer entry = memoizedFrogJumpEntry(memoKey);
+        return entry;
+    }
+
+    private static ArrayList<Integer> test = new ArrayList();
+
+    private static int minJumpToEnd(int arr[], int startIndex, int maxMove) {
+
+        if (startIndex < 0 || startIndex >= arr.length) {
+            return -1;
+        }
+
+        if (arr[startIndex] == 0) {
+            return -1;
+        }
+
+        if (maxMove > arr.length - 1) {
+            return 1;
+        }
+
+        int minJump = -1;
+        for (int i = startIndex + 1; i <= maxMove; i++) {
+            int rock = arr[i];
+            Integer memoizedJump = memoizedFrogJumpEntry(createFrogJumpEntry(rock, i));
+            int currentJump = 0;
+            if (memoizedJump == null) {
+                currentJump = minJumpToEnd(arr, i, rock + i);
+            } else {
+                currentJump = memoizedJump;
+            }
+
+            if (minJump == -1) {
+                minJump = currentJump;
+            } else {
+                minJump = Math.min(currentJump, minJump);
+            }
+        }
+        return minJump + 1;
+    }
+
+    public static int minFrogJumpAnother(int[] arr) {
+        int jump = minJumpToEnd(arr, 0, arr[0]);
+        System.out.print(test);
+        return jump;
+    }
+
+    private static int minFrogJumpInternal(int levelOnRock, int[] arr, int currentIndex, ArrayList<Integer> result) {
+        if (levelOnRock == 0) {
+            return -1;
+        }
+
+        if (levelOnRock + currentIndex >= arr.length - 1) {
+            return 1;
+        }
+
+        int maxMove = currentIndex + levelOnRock;
+        int smallestJump = -1;
+        for (int i = currentIndex + 1; i <= maxMove; i++) {
+            int currentRockLabel = arr[i];
+            int jumpFromCurrentRock = -1;
+            Integer entry = alreadyCalculatedJumpFromCurrentRockLevel(currentRockLabel, i);
+            if (entry != null) {
+                jumpFromCurrentRock = entry;
+                if (jumpFromCurrentRock != -1 && (smallestJump == -1 || smallestJump > entry)) {
+                    smallestJump = entry;
+                }
+                break;
+            } else {
+                jumpFromCurrentRock = minFrogJumpInternal(currentRockLabel, arr, i, result);
+                String memoKey = createFrogJumpEntry(currentRockLabel, i);
+                Integer memoizedValue = alreadyCalculatedJumpFromCurrentRockLevel(currentRockLabel, i);
+                if (memoizedValue == null) {
+                    memoizeFrogJumpEntry(memoKey, jumpFromCurrentRock);
+                }
+                if (jumpFromCurrentRock == -1) {
+                    // ignore - jump not possible
+                } else if (smallestJump == -1) {
+                    smallestJump = jumpFromCurrentRock;
+                    result.add(currentRockLabel);
+                } else if (smallestJump > jumpFromCurrentRock) {
+                    smallestJump = jumpFromCurrentRock;
+                    result.add(currentRockLabel);
+                }
+            }
+        }
+        if (smallestJump != -1) {
+            smallestJump += 1;
+        }
+        return smallestJump;
+    }
+
+    public static ArrayList<Integer> minFrogJump(int arr[]) {
+        ArrayList<Integer> result = new ArrayList();
+        if (arr == null) {
+            return null;
+        }
+        if (arr.length == 1) {
+            result.add(arr[0]);
+            return result;
+        }
+
+        if (arr[0] == 0) {
+            return null;
+        }
+
+        int levelOnRock = arr[0];
+        int jump = minFrogJumpInternal(levelOnRock, arr, 0, result);
+        System.out.println("Jump: " + jump);
+        result.add(levelOnRock);
+        Collections.reverse(result);
+        return result;
+    }
+
     private static ArrayList<Integer> multiplyDigitArrayBySingleDigit(int[] digits, int singleDigit) {
         ArrayList<Integer> result = new ArrayList();
-        if(singleDigit == 0) {
-            for(Integer digit : digits ) {
+        if (singleDigit == 0) {
+            for (Integer digit : digits) {
                 result.add(0);
             }
             return result;
         }
 
         int carry = 0;
-        for(int i = digits.length - 1; i >= 0 ; i--) {
+        for (int i = digits.length - 1; i >= 0; i--) {
             int digit = digits[i];
             int multipliedValue = digit * singleDigit + carry;
             carry = 0;
             int reminder = multipliedValue % 10;
             int quot = (int) (multipliedValue / 10);
-            if(reminder != 0 && quot == 0) {
-                //single digit;
+            if (reminder != 0 && quot == 0) {
+                // single digit;
             } else {
                 carry = quot;
             }
             result.add(reminder);
         }
-        if(carry != 0) {
+        if (carry != 0) {
             result.add(carry);
         }
         Collections.reverse(result);
         return result;
     }
-    
-    private static ArrayList<Integer> addDigitsArrayOfSameLength(int []number1, int []number2) {
+
+    private static ArrayList<Integer> addDigitsArrayOfSameLength(int[] number1, int[] number2) {
         ArrayList<Integer> list = new ArrayList();
         int sum = 0, carry = 0;
-        for(int i = number1.length - 1; i >= 0; i--) {
-            sum = number1[i] + number2[i] + carry ;
+        for (int i = number1.length - 1; i >= 0; i--) {
+            sum = number1[i] + number2[i] + carry;
             carry = 0;
-            int quot = (int)(sum / 10);
+            int quot = (int) (sum / 10);
             int reminder = sum % 10;
-            if( reminder != 0 && quot == 0) {
-                //single digit
-            }else {
+            if (reminder != 0 && quot == 0) {
+                // single digit
+            } else {
                 carry = 1;
             }
             list.add(reminder);
         }
-        if(carry == 1) {
+        if (carry == 1) {
             list.add(1);
         }
         Collections.reverse(list);
         return list;
     }
 
-    public static ArrayList<Integer> multiplyTwoArbitaryPrecisionIntegers(int number1[],int number2[]) {
+    public static ArrayList<Integer> multiplyTwoArbitaryPrecisionIntegers(int number1[], int number2[]) {
         ArrayList<ArrayList<Integer>> products = new ArrayList();
-        for(int i = number2.length -1 ; i >= 0 ; i-- ) {
+        for (int i = number2.length - 1; i >= 0; i--) {
             ArrayList<Integer> singleRowResult = multiplyDigitArrayBySingleDigit(number1, number2[i]);
-            for(int j = 0 ; j < number2.length - i - 1; j++) {
+            for (int j = 0; j < number2.length - i - 1; j++) {
                 singleRowResult.add(0);
             }
             products.add(singleRowResult);
         }
-        //products = makeLargestLengthByAppendingZeroAtBeginning(products);
+        // products = makeLargestLengthByAppendingZeroAtBeginning(products);
         ArrayList<Integer> sum = products.get(0);
-        for(int i = 1 ;i < products.size() ; i++) {
+        for (int i = 1; i < products.size(); i++) {
             ArrayList<Integer> currentList = products.get(i);
-            
+
             ArrayList<ArrayList<Integer>> dummy = new ArrayList();
             dummy.add(currentList);
             dummy.add(sum);
             dummy = makeLargestLengthByAppendingZeroAtBeginning(dummy);
-            sum = addDigitsArrayOfSameLength(convertIntegerArrayToIntArray(dummy.get(0)), convertIntegerArrayToIntArray(dummy.get(1)));
+            sum = addDigitsArrayOfSameLength(convertIntegerArrayToIntArray(dummy.get(0)),
+                    convertIntegerArrayToIntArray(dummy.get(1)));
         }
         return sum;
     }
@@ -95,37 +864,38 @@ public class Array {
     private static int[] convertIntegerArrayToIntArray(ArrayList<Integer> objects) {
         int arr[] = new int[objects.size()];
         int i = 0;
-        for(Integer item: objects) {
+        for (Integer item : objects) {
             arr[i] = item;
             i++;
         }
         return arr;
     }
 
-    private static ArrayList<ArrayList<Integer>> makeLargestLengthByAppendingZeroAtBeginning(ArrayList<ArrayList<Integer>> lists) {
+    private static ArrayList<ArrayList<Integer>> makeLargestLengthByAppendingZeroAtBeginning(
+            ArrayList<ArrayList<Integer>> lists) {
         int maxLength = 0;
-        
-        for(ArrayList<Integer> list : lists) {
+
+        for (ArrayList<Integer> list : lists) {
             int size = list.size();
-            if(maxLength < size) {
+            if (maxLength < size) {
                 maxLength = size;
             }
         }
 
-        for(int j = 0 ; j < lists.size(); j++) {
+        for (int j = 0; j < lists.size(); j++) {
             ArrayList<Integer> list = lists.get(j);
             ArrayList<Integer> newList = new ArrayList();
-            for(int i = 0 ; i < maxLength - list.size() ; i++) {
+            for (int i = 0; i < maxLength - list.size(); i++) {
                 newList.add(0);
             }
             newList.addAll(list);
-            lists.set(j,newList);
+            lists.set(j, newList);
         }
 
         return lists;
     }
 
-    public static ArrayList<Integer> sortArrayWithZerosAndTwos(int arr[]) { //not completed - 
+    public static ArrayList<Integer> sortArrayWithZerosAndTwos(int arr[]) { // not completed -
         int zeroTracker = -1, oneTracker = -1, twoTracker = -1;
         for (int i = 0, j = arr.length - 1; i < arr.length; i++, j++) {
             if (arr[i] == 0) {
@@ -155,15 +925,15 @@ public class Array {
             if (possibleSwapZeroIndex != -1 && possibleSwapOneIndex != -1) {
                 swap(arr, possibleSwapZeroIndex, possibleSwapOneIndex);
             }
-            
+
             if (possibleSwapZeroIndex != -1 && possibleSwapTwoIndex != -1) {
                 swap(arr, possibleSwapZeroIndex, possibleSwapTwoIndex);
-            } 
-            
+            }
+
             if (possibleSwapOneIndex != -1 && possibleSwapTwoIndex != -1) {
                 swap(arr, possibleSwapOneIndex, possibleSwapTwoIndex);
             }
-            
+
         }
 
         return null;
@@ -817,8 +1587,8 @@ public class Array {
     public static class Sort {
 
         private static boolean isSuitableForCountingSort(int arr[]) {
-            for(Integer data : arr) {
-                if(data > 10) {
+            for (Integer data : arr) {
+                if (data > 10) {
                     return false;
                 }
             }
@@ -826,12 +1596,12 @@ public class Array {
         }
 
         private static int maxLinear(int arr[]) {
-            if(arr.length == 0) {
+            if (arr.length == 0) {
                 return 0;
             }
             int max = arr[0];
-            for(int data : arr) {
-                if(max < data) {
+            for (int data : arr) {
+                if (max < data) {
                     max = data;
                 }
             }
@@ -840,26 +1610,26 @@ public class Array {
 
         private static int[] countArrayWithInfoHowManyNumbersAreSmallerThan(int arr[]) {
             int countArray[] = new int[maxLinear(arr) + 1];
-            for(int i = 0 ;i < arr.length ; i++) {
-                countArray[arr[i]] += 1; 
+            for (int i = 0; i < arr.length; i++) {
+                countArray[arr[i]] += 1;
             }
 
             int prevSum = countArray[0];
-            for(int i = 1 ;i < countArray.length ; i++) {
+            for (int i = 1; i < countArray.length; i++) {
                 prevSum += countArray[i];
                 countArray[i] = prevSum;
             }
             return countArray;
         }
 
-        public static int[] countingSort(int arr[] ) {
-            if(!isSuitableForCountingSort(arr)) {
+        public static int[] countingSort(int arr[]) {
+            if (!isSuitableForCountingSort(arr)) {
                 return null;
             }
 
             int result[] = new int[arr.length];
             int countArray[] = countArrayWithInfoHowManyNumbersAreSmallerThan(arr);
-            for(int i = 0 ; i < arr.length; i++) {
+            for (int i = 0; i < arr.length; i++) {
                 int targetIndex = countArray[arr[i]] - 1;
                 result[targetIndex] = arr[i];
                 countArray[arr[i]] = targetIndex;
@@ -966,16 +1736,18 @@ public class Array {
     }
 
     public static void print(int arr[]) {
-        if(arr == null) {
+        if (arr == null) {
             System.out.print("null");
             return;
         }
-        if(arr.length == 0) {
+        if (arr.length == 0) {
             System.out.print("[]");
         }
+        System.out.print(" [ ");
         for (int i = 0; i < arr.length; i++) {
             System.out.print(" " + arr[i] + " ");
         }
+        System.out.print(" ] ");
     }
 
     public static class SubsetSum {

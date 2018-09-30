@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import javaapplication1.Array.MaxProfitStockInfo;
+
 /**
  *
  * @author sambit
@@ -212,8 +214,30 @@ public class JavaApplication1 {
 
         //int arr[] = new int[] {0,4,2,5,3,2,11}; //10 is max
         //Array.print(Array.Sort.countingSort(arr));
-        ArrayList<Integer> list = Array.multiplyTwoArbitaryPrecisionIntegers(new int[]{1,9}, new int[]{2,0});
-        System.out.println(list);
+        //ArrayList<Integer> list = Array.multiplyTwoArbitaryPrecisionIntegers(new int[]{1,9,4,5}, new int[]{2,0,2,4});
+        //System.out.println(list);
+
+        //ArrayList<Integer> list = Array.minFrogJump(new int[]{1, 3, 5, 8, 9, 2, 6, 7, 6, 8, 9});
+        //System.out.print(list);
+
+        //int[] arr = Array.deleteDuplicatesFromSortedArrayWithoutExtraBuffer(new int[]{1,2,2,3,3,3,4,6,7,7,8});
+        //System.out.println("");
+        //Array.print(arr);
+
+        //MaxProfitStockInfo info = Array.maxProfitStockSellBuyOnce(new int[]{3,100,1,5,3,16,4});
+        //ArrayList<MaxProfitStockInfo> list = Array.maxProfitBuySellStockMultipleTimes(new int[]{100, 1080, 260, 310, 40, 535, 695});
+        //System.out.println(list);
+        //System.out.println(Array.maxProfit(list));
+
+        //System.out.println(Number.isPrime(90));
+        //Number.enumerateAllPrimesBelow(90);
+        //Array.print(Array.permutationOfNumbers(new int[]{2, 2, 3, 3}));
+        //System.out.println(Array.validSuduku());
+        //Array.rotate2dArrayBy90DegRight();
+
+        //System.out.println(MyStrings.TelexEncoding.encode("tst_?_!_?!tst"));
+        //System.out.println(MyStrings.RunLengthEncoding.encode("pwwwwaaadexxxxxx"));
+        System.out.println(MyStrings.possibleWordsFromPhoneNumPad(234));
     }
 
 }
