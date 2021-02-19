@@ -3,16 +3,16 @@ package com.spambit.com.spambit.feb2020.array;
 public class QuickSort {
     public static void sort() {
         int arr[] = new int[] {9};
-        int arr1[] = new int[] {2,1,3,4,7,2,1,5};
+        int arr1[] = new int[] {2,1,3,4,7,6,1,5};
         int arr3[] = new int[] {8,6,4,2,1};
         int arr2[] = new int[] {7,6, 8};
         // sortAbs(arr3);
-        partitionAtElement(arr1, 3);
-        print(arr1);
+        partitionAtElement(arr2, 2);
+        print(arr2);
     }
 
     private static void partitionAtElement(int[] arr, int pivotIndex) {
-        if(pivotIndex < 0 && pivotIndex >= arr.length) {
+        if(pivotIndex < 0 || pivotIndex >= arr.length) {
             return;
         }
         IndexRange leftBucket = new IndexRange(0, pivotIndex - 1);
@@ -26,12 +26,12 @@ public class QuickSort {
         if (leftBucket.isValid(arr)) {
             for(int i = leftBucket.start,j = rightBucket.start; true ;) {
                 // don't go beyond limit
-                if (i > leftBucket.end) {
+                if (i >= leftBucket.end) {
                     i = leftBucket.end;
                     leftTraversalDone = true;
                 }
-                if (j > arr.length - 1) {
-                    j = arr.length - 1;
+                if (j >= rightBucket.end) {
+                    j = rightBucket.end;
                     rightTraversalDone = true;
                 }
 
@@ -49,14 +49,11 @@ public class QuickSort {
                     smallerValIndex = j;
                     foundSmallerAtRightBucket = true;
                 }
-                if (!foundBiggerAtLeftBucket && foundSmallerAtRightBucket && !leftTraversalDone) {
+                if (!foundBiggerAtLeftBucket && !leftTraversalDone) {
                     i++;
                 }
-                if (foundBiggerAtLeftBucket && !foundSmallerAtRightBucket && !rightTraversalDone) {
+                if (!foundSmallerAtRightBucket && !rightTraversalDone) {
                     j++;
-                }
-                if (!foundBiggerAtLeftBucket && !foundSmallerAtRightBucket) {
-                    j++; i++;
                 }
                 // when you find both smaller and bigger element, swap between them
                 if (foundBiggerAtLeftBucket && foundSmallerAtRightBucket) {
@@ -72,12 +69,14 @@ public class QuickSort {
                     swap(arr, pivotIndex + 1, j);
                     swap(arr, pivotIndex, pivotIndex + 1);
                     pivotIndex ++;
+                    foundSmallerAtRightBucket = false;
                 }
                 if (!leftTraversalDone && rightTraversalDone && foundBiggerAtLeftBucket) {
                     // swap between pivotIndex - 1 and i then swap pivotIndex and pivotIndex -1
                     swap(arr, pivotIndex - 1, i);
                     swap(arr, pivotIndex, pivotIndex - 1);
                     pivotIndex --;
+                    foundBiggerAtLeftBucket = false;
                 }
             }
         }
@@ -136,7 +135,7 @@ public class QuickSort {
     }
 
     private static void swap(int arr[], int i, int j) {
-        if (i < 0 || j < 0) {
+        if ( i < 0 || i >= arr.length || j < 0 || j >= arr.length ) {
             return;
         }
         int temp = arr[j];
